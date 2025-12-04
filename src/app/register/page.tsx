@@ -1,28 +1,17 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { LoginForm } from "./_components/login-form";
+import { RegisterForm } from "./_components/register-form";
 
-export default async function Home() {
+export default async function RegisterPage() {
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // 既にログイン済みの場合はリダイレクト
   if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile) {
-      if (profile.role === "coach") {
-        redirect("/coach/dashboard");
-      } else if (profile.role === "student") {
-        redirect("/student/bookings");
-      }
-    }
+    redirect("/");
   }
 
   return (
@@ -33,7 +22,7 @@ export default async function Home() {
           ゲームコーチングプラットフォーム
         </p>
       </div>
-      <LoginForm />
+      <RegisterForm />
     </main>
   );
 }
