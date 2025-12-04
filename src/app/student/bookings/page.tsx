@@ -1,5 +1,11 @@
 import { redirect } from "next/navigation";
+import type { Tables } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/server";
+
+type BookingWithRelations = Tables<"bookings"> & {
+  plans: Pick<Tables<"plans">, "title" | "duration_minutes"> | null;
+  coach: Pick<Tables<"profiles">, "display_name" | "avatar_url"> | null;
+};
 
 export default async function StudentBookingsPage() {
   const supabase = await createClient();
@@ -31,7 +37,8 @@ export default async function StudentBookingsPage() {
     `,
     )
     .eq("student_id", user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .returns<BookingWithRelations[]>();
 
   return (
     <main className="min-h-screen p-8">
@@ -46,24 +53,15 @@ export default async function StudentBookingsPage() {
             >
               <div>
                 <p className="font-semibold">
-                  {(
-                    booking.plans as unknown as {
-                      title: string;
-                      duration_minutes: number;
-                    } | null
-                  )?.title ?? "プラン情報なし"}
+                  {booking.plans?.title ?? "プラン情報なし"}
                 </p>
                 <p className="text-sm text-gray-600">
-                  コーチ:{" "}
-                  {(
-                    booking.coach as unknown as {
-                      display_name: string;
-                      avatar_url: string | null;
-                    } | null
-                  )?.display_name ?? "不明"}
+                  コーチ: {booking.coach?.display_name ?? "不明"}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {new Date(booking.created_at).toLocaleDateString("ja-JP")}
+                  {booking.created_at
+                    ? new Date(booking.created_at).toLocaleDateString("ja-JP")
+                    : "日付不明"}
                 </p>
               </div>
               <div className="text-right">
