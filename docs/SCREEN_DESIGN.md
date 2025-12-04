@@ -6,8 +6,11 @@
 
 | 画面名 | パス | 概要 | 主要要素・アクション |
 | --- | --- | --- | --- |
-| **トップページ / ログイン** | `/` | アプリケーションの入り口。未ログイン時はログインを促す。 | ・サービスロゴ/説明<br>・「ログイン / 新規登録」ボタン (Supabase Auth) |
-| **認証コールバック** | `/auth/callback` | Supabase Authのリダイレクト先 (画面としては意識しない)。 | ・セッション確立処理<br>・ロールに応じたリダイレクト (コーチor生徒) |
+| **トップページ / ログイン** | `/` | アプリケーションの入り口。未ログイン時はログインを促す。 | ・サービスロゴ/説明<br>・ログインフォーム<br>・新規登録リンク |
+| **アカウント登録** | `/register` | 新規ユーザー登録画面。 | ・メールアドレス/パスワード入力<br>・ロール選択 (生徒/コーチ)<br>・登録ボタン |
+| **メール確認待ち** | `/register/confirm` | 認証メール送信完了を通知する画面。 | ・認証メール送信メッセージ<br>・メール確認のお願い<br>・ログインページへのリンク |
+| **認証コールバック** | `/auth/callback` | Supabase Authのリダイレクト先 (画面としては意識しない)。 | ・セッション確立処理<br>・プロフィール作成<br>・ロールに応じたリダイレクト (コーチor生徒) |
+
 
 ## 2. コーチ向け画面 (Coach Views)
 
@@ -46,6 +49,11 @@ Stripe Connectのフローで使用されるシステム画面です。
 graph TD
     root["/ (Top/Login)"] -->|Login as Coach| c_dash["/coach/dashboard"]
     root -->|Login as Student| s_list["/coaches"]
+    root -->|Register| reg["/register"]
+    reg -->|Submit| confirm["/register/confirm"]
+    confirm -.->|Email Link| callback["/auth/callback"]
+    callback -->|Coach| c_dash
+    callback -->|Student| s_hist
 
     subgraph Coach
         c_dash --> c_settings["/coach/settings"]

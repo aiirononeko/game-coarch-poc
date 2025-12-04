@@ -32,6 +32,8 @@ export async function signup(formData: FormData) {
   const password = formData.get('password') as string
   const role = formData.get('role') as string || 'student'
 
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -39,6 +41,7 @@ export async function signup(formData: FormData) {
       data: {
         role,
       },
+      emailRedirectTo: `${origin}/auth/callback`,
     },
   })
 
@@ -47,7 +50,7 @@ export async function signup(formData: FormData) {
     redirect('/error')
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/register/confirm')
 }
+
 
