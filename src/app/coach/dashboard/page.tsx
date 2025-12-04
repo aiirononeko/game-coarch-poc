@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { StripeConnectButton } from "@/components/stripe/stripe-connect-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -225,9 +226,7 @@ export default async function CoachDashboardPage() {
                   </Link>
                 </Button>
               ) : (
-                <Button asChild variant="default" size="sm">
-                  <Link href="/coach/settings">Stripe連携する</Link>
-                </Button>
+                <StripeConnectButton hasAccount={!!profile.stripe_account_id} />
               )}
             </CardContent>
           </Card>
